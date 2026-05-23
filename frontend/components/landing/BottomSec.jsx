@@ -15,13 +15,13 @@ export const BottomSec = () => {
       </h2>
       <div className="flex gap-3 flex-wrap">
         <Link
-          to="/signup"
+          to="/auth"
           className="px-6 py-3 rounded-xl bg-emerald-600 text-white font-medium text-sm hover:bg-emerald-700 transition-colors"
         >
           Create your account →
         </Link>
         <Link
-          to="/login"
+          to="/auth"
           className="px-6 py-3 rounded-xl border border-gray-300 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors"
         >
           Log in

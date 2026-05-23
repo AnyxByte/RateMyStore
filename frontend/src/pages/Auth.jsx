@@ -4,11 +4,10 @@ import LoginForm from "../../components/auth/Login";
 import { Link } from "react-router";
 
 export default function Auth() {
-  const [mode, setMode] = useState("login"); 
+  const [mode, setMode] = useState("login");
 
   return (
     <div className="min-h-screen bg-stone-50 flex font-sans">
-      {/* Left panel — branding */}
       <div className="hidden lg:flex flex-col justify-between w-[42%] bg-emerald-600 px-12 py-10 text-white">
         <div>
           <Link
@@ -37,7 +36,6 @@ export default function Auth() {
               : "Create your free account to start rating stores, tracking your reviews, and contributing to a transparent marketplace."}
           </p>
 
-          {/* Feature pills */}
           <div className="flex flex-col gap-2 mt-8">
             {[
               { icon: "🏪", text: "Browse all registered stores" },
@@ -56,14 +54,12 @@ export default function Auth() {
         </div>
 
         <p className="text-emerald-200 text-xs">
-          © {new Date().getFullYear()} RateMyStore 
+          © {new Date().getFullYear()} RateMyStore
         </p>
       </div>
 
-      {/* Right panel — form */}
       <div className="flex-1 flex items-center justify-center px-6 py-10">
         <div className="w-full max-w-sm">
-          {/* Mobile logo */}
           <div className="flex items-center gap-2 mb-8 lg:hidden">
             <span className="text-xl">⭐</span>
             <span className="font-semibold text-base text-gray-900 tracking-tight">
@@ -71,7 +67,6 @@ export default function Auth() {
             </span>
           </div>
 
-          {/* Tab switcher */}
           <div className="flex bg-gray-100 rounded-xl p-1 mb-7">
             {["login", "signup"].map((tab) => (
               <button

@@ -1,5 +1,10 @@
 import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { useNavigate } from "react-router";
 import InputField from "./InputField";
+import API from "../../src/services/api";
+import { toast } from "react-hot-toast";
+
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const loginRules = {
   email: {
@@ -12,6 +17,9 @@ const loginRules = {
 };
 
 export default function LoginForm({ onSwitch }) {
+  const navigate = useNavigate();
+  const [apiError, setApiError] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -19,18 +27,44 @@ export default function LoginForm({ onSwitch }) {
   } = useForm({ mode: "onTouched" });
 
   const onSubmit = async (data) => {
-    // Replace with your API call: POST /api/auth/login
-    await new Promise((r) => setTimeout(r, 1000));
-    console.log("Login payload:", data);
-    alert("Login successful! (wire up your API)");
+    setApiError("");
+
+    try {
+      const response = await API.post("/auth/login", data);
+
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+
+      const userRole = response.data.user.role;
+      toast.success("Logged In");
+
+      if (userRole === "Admin") {
+        navigate("/dashboard");
+      } else if (userRole === "StoreOwner") {
+        navigate("/dashboard");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (err) {
+      toast.error("Error");
+      console.error("Login API Error:", err.response?.data);
+      setApiError(
+        err.response?.data?.error || "Invalid email or password execution.",
+      );
+    }
   };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       noValidate
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-3"
     >
+      {apiError && (
+        <div className="p-2.5 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-xl leading-snug">
+          {apiError}
+        </div>
+      )}
+
       <InputField
         label="Email address"
         id="login-email"
@@ -39,6 +73,7 @@ export default function LoginForm({ onSwitch }) {
         registration={register("email", loginRules.email)}
         error={errors.email}
       />
+
       <InputField
         label="Password"
         id="login-password"
@@ -48,29 +83,14 @@ export default function LoginForm({ onSwitch }) {
         error={errors.password}
       />
 
-      <div className="flex items-center justify-between text-xs">
-        <label className="flex items-center gap-2 text-gray-500 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-            {...register("rememberMe")}
-          />
-          Remember me
-        </label>
-        <a
-          href="/forgot-password"
-          className="text-emerald-600 hover:underline font-medium"
-        >
-          Forgot password?
-        </a>
-      </div>
-
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-medium text-sm
+        className="w-full py-2 rounded-xl bg-emerald-600 text-white font-medium text-sm
           hover:bg-emerald-700 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed mt-1"
       >
+        {" "}
+        {/* Trimmed height padding to py-2 to maintain compact visual alignment */}
         {isSubmitting ? (
           <span className="flex items-center justify-center gap-2">
             <svg

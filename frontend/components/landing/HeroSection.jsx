@@ -48,7 +48,7 @@ export default function HeroSection() {
         </p>
         <div className="flex gap-3">
           <Link
-            to="/signup"
+            to="/auth"
             className="px-6 py-3 rounded-xl bg-emerald-600 text-white font-medium text-sm hover:bg-emerald-700 transition-colors"
           >
             Get started free →

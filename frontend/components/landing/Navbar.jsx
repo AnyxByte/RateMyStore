@@ -13,13 +13,13 @@ export default function Navbar() {
         </div>
         <div className="flex gap-2">
           <Link
-            to="/login"
+            to="/auth"
             className="px-4 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 font-medium hover:bg-gray-50 transition-colors"
           >
             Log in
           </Link>
           <Link
-            to="/signup"
+            to="/auth"
             className="px-4 py-2 rounded-lg bg-emerald-600 text-sm text-white font-medium hover:bg-emerald-700 transition-colors"
           >
             Sign up

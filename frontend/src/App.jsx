@@ -157,13 +157,13 @@ export default function App() {
         </div>
         <div className="flex gap-2">
           <a
-            href="/login"
+            href="/auth"
             className="px-4 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 font-medium hover:bg-gray-50 transition-colors"
           >
             Log in
           </a>
           <a
-            href="/signup"
+            href="/auth"
             className="px-4 py-2 rounded-lg bg-emerald-600 text-sm text-white font-medium hover:bg-emerald-700 transition-colors"
           >
             Sign up
@@ -189,7 +189,7 @@ export default function App() {
           </p>
           <div className="flex gap-3">
             <a
-              href="/signup"
+              href="/auth"
               className="px-6 py-3 rounded-xl bg-emerald-600 text-white font-medium text-sm hover:bg-emerald-700 transition-colors"
             >
               Get started free →
@@ -292,13 +292,13 @@ export default function App() {
         </h2>
         <div className="flex gap-3 flex-wrap">
           <a
-            href="/signup"
+            href="/auth"
             className="px-6 py-3 rounded-xl bg-emerald-600 text-white font-medium text-sm hover:bg-emerald-700 transition-colors"
           >
             Create your account →
           </a>
           <a
-            href="/login"
+            href="/auth"
             className="px-6 py-3 rounded-xl border border-gray-300 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors"
           >
             Log in
