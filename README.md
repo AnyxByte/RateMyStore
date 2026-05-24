@@ -146,6 +146,9 @@ This project uses **[NeonDB](https://neon.tech)** — a serverless PostgreSQL pl
 ### Step 2 — Admin credentials
 
 Admin login credentials will be shared separately. Please contact the project owner to get access.
+email:- admin@admin.com 
+password:- Suprodip456@
+Also the above email , password is only for the deployed version of this code
 
 ---
 
