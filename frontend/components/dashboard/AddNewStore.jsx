@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import API from "../../src/services/api";
 import { formInputClass } from "../auth/FormInputClass";
+import { toast } from "react-hot-toast";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_REGEX =
@@ -22,11 +23,12 @@ export default function AddNewStore({ setShowAddStore, onSuccess }) {
 
     try {
       await API.post("/admin/stores/create", data);
-
+      toast.success("Store Added");
       onSuccess();
       resetStore();
       setShowAddStore(false);
     } catch (err) {
+      toast.error("Error");
       console.error(
         "Storefront addition API transaction error:",
         err.response?.data,

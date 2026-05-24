@@ -143,7 +143,6 @@ export default function AddNewUser({ setShowAddUser, onSuccess }) {
           >
             <option value="user">Normal User</option>
             <option value="admin">Admin</option>
-            <option value="store_owner">Store Owner</option>
           </select>
         </div>
 
