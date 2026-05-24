@@ -72,6 +72,7 @@ This project uses **NeonDB** as its database. NeonDB provides a single connectio
 PORT=3000
 DATABASE_URL=postgresql://your_user:your_password@your_project.neon.tech/your_db?sslmode=require
 JWT_SECRET=your_super_secret_jwt_key
+FRONTEND_URL=your-localhost-url/deployed-url
 ```
 
 > Get your `DATABASE_URL` from the **NeonDB dashboard → your project → Connection Details → Connection string**.
