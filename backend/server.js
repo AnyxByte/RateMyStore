@@ -10,7 +10,7 @@ dotenv.config();
 
 const app = express();
 
-const allowedOrigins = [process.env.FRONTEND_URL];
+const allowedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL];
 
 app.use(
   cors({
@@ -27,13 +27,12 @@ app.use(
   }),
 );
 
-
 app.use(express.json());
 
 await initDB();
 
 app.get("/api/health", (req, res) => {
-  res.status(200).json({
+  return res.status(200).json({
     status: "Healthy",
     message: "Backend is running smoothly and connected to NeonDB.",
   });
