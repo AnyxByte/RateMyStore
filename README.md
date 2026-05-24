@@ -72,7 +72,7 @@ This project uses **NeonDB** as its database. NeonDB provides a single connectio
 PORT=3000
 DATABASE_URL=postgresql://your_user:your_password@your_project.neon.tech/your_db?sslmode=require
 JWT_SECRET=your_super_secret_jwt_key
-FRONTEND_URL=your-localhost-url/deployed-url
+FRONTEND_URL=your-localhost-url or deployed-url
 ```
 
 > Get your `DATABASE_URL` from the **NeonDB dashboard → your project → Connection Details → Connection string**.
@@ -145,11 +145,11 @@ This project uses **[NeonDB](https://neon.tech)** — a serverless PostgreSQL pl
 5. Paste it as `DATABASE_URL` in `backend/.env`
 
 ### Step 2 — Admin credentials
+### 🌐 Deployed Access vs. Localhost Testing
 
-Admin login credentials will be shared separately. Please contact the project owner to get access.
-email:- admin@admin.com 
-password:- Suprodip456@
-Also the above email , password is only for the deployed version of this code
+* **Live Deployed Environment:** * **Admin Email:** `admin@admin.com`
+  **Admin Password:** `Suprodip456@`  *(Note: These credentials only work on the live deployed version of the application).*
+* **Localhost Environment:** * You can go to neondb console, change the role of the user to 'Admin' and continue working
 
 ---
 
