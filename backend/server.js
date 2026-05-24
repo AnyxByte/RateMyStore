@@ -3,6 +3,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { initDB } from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import storeRoutes from "./routes/storeRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -20,6 +23,9 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/store", storeRoutes);
+app.use("/api/admin",adminRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

@@ -149,7 +149,6 @@ export default function App() {
         rel="stylesheet"
       />
 
-      {/* Navbar */}
       <nav className="flex items-center justify-between px-8 h-15 bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="flex items-center gap-2">
           <span className="text-xl">⭐</span>
@@ -171,7 +170,6 @@ export default function App() {
         </div>
       </nav>
 
-      {/* Hero */}
       <section className="max-w-6xl mx-auto px-8 py-20 grid grid-cols-2 gap-12 items-center">
         <div>
           <div className="inline-flex items-center gap-1.5 text-xs font-medium tracking-widest uppercase text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full mb-5">
@@ -210,7 +208,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* Stats bar */}
       <div className="bg-emerald-600 py-10 px-8">
         <div className="max-w-3xl mx-auto grid grid-cols-4 gap-4 text-center">
           {stats.map((stat) => (
@@ -227,7 +224,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* Features */}
       <section className="max-w-6xl mx-auto px-8 py-16">
         <p className="text-xs font-medium tracking-widest uppercase text-gray-400 mb-1">Features</p>
         <h2
@@ -249,7 +245,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* Roles */}
       <section className="bg-gray-100 py-16 px-8">
         <div className="max-w-6xl mx-auto">
           <p className="text-xs font-medium tracking-widest uppercase text-gray-400 mb-1">User Roles</p>
@@ -280,7 +275,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* Bottom CTA */}
       <section className="max-w-6xl mx-auto px-8 py-20 flex items-center justify-between gap-8 flex-wrap">
         <h2
           className="text-4xl font-normal max-w-md leading-tight text-gray-900"
@@ -306,7 +300,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-gray-200 py-5 text-center text-xs text-gray-400">
         © {new Date().getFullYear()} RateMyStore.
       </footer>

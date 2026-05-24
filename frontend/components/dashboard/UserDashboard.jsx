@@ -4,41 +4,7 @@ import Layout from "./Layout";
 import PasswordChangeForm from "./PasswordChangeForm";
 import SortableHeader from "./SortableHeader";
 import StarDisplay from "./StarDisplay";
-
-const MOCK_STORES = [
-  {
-    id: 1,
-    name: "The Artisan Bakehouse Mumbai",
-    email: "bakehouse@example.com",
-    address: "12 Green Park Lane, Mumbai",
-    avgRating: 4.2,
-    totalRatings: 128,
-  },
-  {
-    id: 2,
-    name: "Sunrise Electronics Trading Hub",
-    email: "sunrise@example.com",
-    address: "45 Connaught Place, Delhi",
-    avgRating: 4.8,
-    totalRatings: 87,
-  },
-  {
-    id: 3,
-    name: "Himalayan Organic Food Store",
-    email: "himalayan@example.com",
-    address: "7 Brigade Road, Bangalore",
-    avgRating: 3.9,
-    totalRatings: 54,
-  },
-  {
-    id: 4,
-    name: "Metro Fashion Apparel Boutique",
-    email: "metro@example.com",
-    address: "99 Park Street, Kolkata",
-    avgRating: 4.5,
-    totalRatings: 210,
-  },
-];
+import { useStores } from "../../src/context/StoreContext";
 
 function StarInput({ value, onChange }) {
   const [hovered, setHovered] = useState(null);
@@ -63,19 +29,22 @@ function StarInput({ value, onChange }) {
 
 export default function UserDashboard({ onLogout }) {
   const [activeTab, setActiveTab] = useState("stores");
-  const [search, setSearch] = useState({ name: "", address: "" });
-  const [ratings, setRatings] = useState({ 1: 4 }); // storeId -> userRating
 
-  const filteredStores = MOCK_STORES.filter(
-    (s) =>
-      s.name.toLowerCase().includes(search.name.toLowerCase()) &&
-      s.address.toLowerCase().includes(search.address.toLowerCase()),
-  );
+  const {
+    stores,
+    loading,
+    searchName,
+    setSearchName,
+    searchAddress,
+    setSearchAddress,
+    submitStoreRating,
+  } = useStores();
+
   const {
     sorted: sortedStores,
     sortConfig,
     toggle,
-  } = useSortableTable(filteredStores, "name");
+  } = useSortableTable(stores, "store_name");
 
   const tabs = [
     { id: "stores", label: "Browse Stores", icon: "🏪" },
@@ -90,7 +59,6 @@ export default function UserDashboard({ onLogout }) {
       setActiveTab={setActiveTab}
       tabs={tabs}
     >
-      {/* STORES */}
       {activeTab === "stores" && (
         <div className="space-y-4">
           <div>
@@ -105,35 +73,37 @@ export default function UserDashboard({ onLogout }) {
           <div className="flex gap-3">
             <input
               placeholder="Search by store name…"
-              value={search.name}
-              onChange={(e) =>
-                setSearch((p) => ({ ...p, name: e.target.value }))
-              }
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
               className="flex-1 px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 bg-white"
             />
             <input
               placeholder="Search by address…"
-              value={search.address}
-              onChange={(e) =>
-                setSearch((p) => ({ ...p, address: e.target.value }))
-              }
+              value={searchAddress}
+              onChange={(e) => setSearchAddress(e.target.value)}
               className="flex-1 px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 bg-white"
             />
           </div>
 
-          <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+          <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm relative">
+            {loading && (
+              <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center z-10">
+                <div className="animate-spin h-5 w-5 border-2 border-emerald-500 border-t-transparent rounded-full"></div>
+              </div>
+            )}
+
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
                   <SortableHeader
                     label="Store Name"
-                    field="name"
+                    field="store_name"
                     sortConfig={sortConfig}
                     onSort={toggle}
                   />
                   <SortableHeader
                     label="Address"
-                    field="address"
+                    field="store_address"
                     sortConfig={sortConfig}
                     onSort={toggle}
                   />
@@ -150,30 +120,34 @@ export default function UserDashboard({ onLogout }) {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {sortedStores.map((store) => {
-                  const userRating = ratings[store.id] ?? null;
+                  const userRating =
+                    store.user_submitted_rating > 0
+                      ? store.user_submitted_rating
+                      : null;
+
                   return (
                     <tr
-                      key={store.id}
+                      key={store.store_id}
                       className="hover:bg-gray-50 transition-colors"
                     >
                       <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                        {store.name}
+                        {store.store_name}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-500">
-                        {store.address}
+                        {store.store_address}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5">
-                          <StarDisplay value={store.avgRating} />
+                          <StarDisplay value={store.overall_rating} />
                           <span className="text-xs font-semibold text-amber-600">
-                            {store.avgRating.toFixed(1)}
+                            {store.overall_rating.toFixed(1)}
                           </span>
                           <span className="text-xs text-gray-400">
-                            ({store.totalRatings})
+                            ({store.total_ratings_count})
                           </span>
                         </div>
                       </td>
-                      {/* ── Your Rating column: stars + numeric value ── */}
+
                       <td className="px-4 py-3">
                         {userRating ? (
                           <div className="flex items-center gap-1.5">
@@ -189,19 +163,17 @@ export default function UserDashboard({ onLogout }) {
                           </span>
                         )}
                       </td>
-                      {/* ── Submit / Modify: reusable StarInput ── */}
+
                       <td className="px-4 py-3">
                         <StarInput
                           value={userRating}
                           onChange={(val) =>
-                            setRatings((p) => ({ ...p, [store.id]: val }))
+                            submitStoreRating(store.store_id, val)
                           }
                         />
                         {userRating && (
                           <div className="text-xs text-emerald-600 mt-0.5 font-medium">
-                            {ratings[store.id] !== undefined
-                              ? "✓ Click to modify"
-                              : "Submitted!"}
+                            ✓ Click to modify
                           </div>
                         )}
                       </td>
@@ -210,16 +182,16 @@ export default function UserDashboard({ onLogout }) {
                 })}
               </tbody>
             </table>
-            {sortedStores.length === 0 && (
+
+            {sortedStores.length === 0 && !loading && (
               <div className="text-center py-10 text-sm text-gray-400">
-                No stores match your search
+                No stores match your search criteria
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* SETTINGS */}
       {activeTab === "settings" && (
         <div className="max-w-md space-y-6">
           <div>

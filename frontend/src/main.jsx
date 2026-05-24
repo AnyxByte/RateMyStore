@@ -6,6 +6,7 @@ import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import { Toaster } from "react-hot-toast";
 import Dashboard from "./pages/Dashboard";
+import { StoreProvider } from "./context/StoreContext";
 
 const router = createBrowserRouter([
   {
@@ -18,7 +19,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <Dashboard />,
+    element: (
+      <StoreProvider>
+        <Dashboard />
+      </StoreProvider>
+    ),
   },
 ]);
 

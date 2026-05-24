@@ -34,7 +34,6 @@ export default function Layout({
         </button>
       </nav>
 
-      {/* Tab bar */}
       <div className="bg-white border-b border-gray-200 px-6">
         <div className="flex">
           {tabs.map((tab) => (

@@ -9,9 +9,8 @@ const generateToken = (id, email, role) => {
 };
 
 export const signupUser = async (req, res) => {
-  const { name, email, password, address, role } = req.body;
+  const { name, email, password, address, role, storeName } = req.body;
 
-  // --- FORM VALIDATIONS ---
   if (!name || name.trim().length < 20 || name.trim().length > 60) {
     return res.status(400).json({
       error:
@@ -44,6 +43,13 @@ export const signupUser = async (req, res) => {
   const assignedRole =
     role && ["User", "StoreOwner"].includes(role) ? role : "User";
 
+  if (assignedRole === "StoreOwner" && (!storeName || !storeName.trim())) {
+    return res.status(400).json({
+      error:
+        "Validation Error: Store Business Name is required for Store Owners.",
+    });
+  }
+
   try {
     const userExistCheck = await query(
       "SELECT id FROM users WHERE email = $1",
@@ -55,23 +61,52 @@ export const signupUser = async (req, res) => {
         .json({ error: "An account with this email already exists." });
     }
 
+    if (assignedRole === "StoreOwner") {
+      const storeExistCheck = await query(
+        "SELECT id FROM stores WHERE email = $1",
+        [email],
+      );
+      if (storeExistCheck.rows.length > 0) {
+        return res
+          .status(409)
+          .json({ error: "A store with this email already exists." });
+      }
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+
+    await query("BEGIN");
 
     const insertUserQuery = `
       INSERT INTO users (name, email, password, address, role)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING id, name, email, address, role;
     `;
-
-    const result = await query(insertUserQuery, [
+    const userResult = await query(insertUserQuery, [
       name,
       email,
       hashedPassword,
       address,
       assignedRole,
     ]);
-    const newUser = result.rows[0];
+    const newUser = userResult.rows[0];
+
+    if (assignedRole === "StoreOwner") {
+      const insertStoreQuery = `
+        INSERT INTO stores (name, email, address, owner_id)
+        VALUES ($1, $2, $3, $4);
+      `;
+
+      await query(insertStoreQuery, [
+        storeName.trim(),
+        email,
+        address,
+        newUser.id,
+      ]);
+    }
+
+    await query("COMMIT");
 
     const token = generateToken(newUser.id, newUser.email, newUser.role);
 
@@ -87,13 +122,13 @@ export const signupUser = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Signup DB Error:", error);
+    await query("ROLLBACK");
+    console.error("Signup DB Transaction Error:", error);
     res
       .status(500)
       .json({ error: "Internal Server Error during registration processing." });
   }
 };
-
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -114,7 +149,6 @@ export const loginUser = async (req, res) => {
 
     const user = userResult.rows[0];
 
-    // Verify Password match
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
       return res.status(401).json({ error: "Invalid login credentials." });

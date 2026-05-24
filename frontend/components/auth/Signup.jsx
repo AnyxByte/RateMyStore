@@ -43,6 +43,17 @@ const signupRules = {
   role: {
     required: "Please select your profile account type",
   },
+  storeName: {
+    required: "Store name is required for registration",
+    minLength: {
+      value: 3,
+      message: "Store name must be at least 3 characters",
+    },
+    maxLength: {
+      value: 100,
+      message: "Store name cannot exceed 100 characters",
+    },
+  },
 };
 
 export default function SignupForm({ onSwitch }) {
@@ -59,6 +70,7 @@ export default function SignupForm({ onSwitch }) {
     mode: "onTouched",
     defaultValues: {
       role: "User",
+      storeName: "",
     },
   });
 
@@ -68,21 +80,22 @@ export default function SignupForm({ onSwitch }) {
   const onSubmit = async (data) => {
     setApiError("");
     const { ...payload } = data;
-    console.log("payload", payload);
+
+    if (payload.role !== "StoreOwner") {
+      delete payload.storeName;
+    }
+
+    console.log("Submitting refined payload:", payload);
 
     try {
       const response = await API.post("/auth/signup", payload);
 
       localStorage.setItem("user", JSON.stringify(response.data.user));
-      toast.success("Signed Up");
+      toast.success("Signed Up successfully!");
 
-      if (response.data.user.role === "StoreOwner") {
-        navigate("/dashboard");
-      } else {
-        navigate("/dashboard");
-      }
+      navigate("/dashboard");
     } catch (err) {
-      toast.error("Error");
+      toast.error("Registration Error");
       console.error("Signup error response:", err.response?.data);
       setApiError(
         err.response?.data?.error ||
@@ -281,6 +294,20 @@ export default function SignupForm({ onSwitch }) {
           <p className="text-[11px] text-red-500">{errors.role.message}</p>
         )}
       </div>
+
+      {selectedRole === "StoreOwner" && (
+        <div className="animate-fadeIn">
+          {" "}
+          <InputField
+            label="Store Business Name"
+            id="signup-storename"
+            type="text"
+            placeholder="Enter your official store name"
+            registration={register("storeName", signupRules.storeName)}
+            error={errors.storeName}
+          />
+        </div>
+      )}
 
       <button
         type="submit"

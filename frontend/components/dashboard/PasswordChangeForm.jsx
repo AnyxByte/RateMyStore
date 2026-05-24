@@ -1,9 +1,14 @@
 import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { toast } from "react-hot-toast";
+import API from "../../src/services/api";
 
 const PASSWORD_REGEX =
-  /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[]{};':"\\|,.<>\/\?]).{8,16}$/;
+  /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,16}$/;
 
 export default function PasswordChangeForm({ accentColor = "emerald" }) {
+  const [apiError, setApiError] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -19,7 +24,7 @@ export default function PasswordChangeForm({ accentColor = "emerald" }) {
     },
     amber: {
       ring: "focus:border-amber-400 focus:ring-amber-100",
-      btn: "bg-amber-500 hover:bg-amberald-600",
+      btn: "bg-amber-500 hover:bg-amber-600",
     },
     blue: {
       ring: "focus:border-blue-400 focus:ring-blue-100",
@@ -28,13 +33,24 @@ export default function PasswordChangeForm({ accentColor = "emerald" }) {
   }[accentColor];
 
   const onSubmit = async (data) => {
-    // Replace with: PATCH /api/auth/change-password
-    await new Promise((r) => setTimeout(r, 800));
-    console.log("Change password payload:", {
-      currentPassword: data.current,
+    setApiError("");
+
+    const payload = {
+      oldPassword: data.current,
       newPassword: data.next,
-    });
-    reset();
+    };
+
+    try {
+      await API.post("/user/change-password", payload);
+      toast.success("Password changed");
+      reset();
+    } catch (err) {
+      toast.error("Error");
+      console.error("Password Update API Error:", err.response?.data);
+      setApiError(
+        err.response?.data?.error || "Failed to alter password statement.",
+      );
+    }
   };
 
   const fields = [
@@ -68,6 +84,12 @@ export default function PasswordChangeForm({ accentColor = "emerald" }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+      {apiError && (
+        <div className="p-2.5 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-xl leading-snug">
+          {apiError}
+        </div>
+      )}
+
       {fields.map(({ label, id, rules }) => (
         <div key={id}>
           <label className="text-xs font-medium text-gray-600 mb-1 block">
@@ -94,7 +116,7 @@ export default function PasswordChangeForm({ accentColor = "emerald" }) {
         8–16 chars, one uppercase letter, one special character
       </p>
 
-      {isSubmitSuccessful && (
+      {isSubmitSuccessful && !apiError && (
         <div className="text-xs text-emerald-600 font-medium bg-emerald-50 px-3 py-2 rounded-lg">
           ✓ Password updated successfully
         </div>

@@ -1,96 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import useSortableTable from "../../src/hooks/useSortableTable";
+import API from "../../src/services/api";
+import Layout from "./Layout";
 import PasswordChangeForm from "./PasswordChangeForm";
 import SortableHeader from "./SortableHeader";
 import StarDisplay from "./StarDisplay";
-import Layout from "./Layout";
 import { StatCard } from "./StatCard";
-import useSortableTable from "../../src/hooks/useSortableTable";
-
-const MOCK_STORES = [
-  {
-    id: 1,
-    name: "The Artisan Bakehouse Mumbai",
-    email: "bakehouse@example.com",
-    address: "12 Green Park Lane, Mumbai",
-    avgRating: 4.2,
-    totalRatings: 128,
-  },
-  {
-    id: 2,
-    name: "Sunrise Electronics Trading Hub",
-    email: "sunrise@example.com",
-    address: "45 Connaught Place, Delhi",
-    avgRating: 4.8,
-    totalRatings: 87,
-  },
-  {
-    id: 3,
-    name: "Himalayan Organic Food Store",
-    email: "himalayan@example.com",
-    address: "7 Brigade Road, Bangalore",
-    avgRating: 3.9,
-    totalRatings: 54,
-  },
-  {
-    id: 4,
-    name: "Metro Fashion Apparel Boutique",
-    email: "metro@example.com",
-    address: "99 Park Street, Kolkata",
-    avgRating: 4.5,
-    totalRatings: 210,
-  },
-];
-
-const MOCK_RATINGS = [
-  {
-    id: 1,
-    userId: 2,
-    storeId: 1,
-    rating: 4,
-    userName: "Marcus Benjamin Thornton",
-    date: "2025-05-10",
-  },
-  {
-    id: 2,
-    userId: 3,
-    storeId: 1,
-    rating: 5,
-    userName: "Priya Suresh Nair Krishnamurthy",
-    date: "2025-05-15",
-  },
-  {
-    id: 3,
-    userId: 6,
-    storeId: 1,
-    rating: 3,
-    userName: "Rohan Vikram Desai Patwardhan",
-    date: "2025-05-18",
-  },
-  {
-    id: 4,
-    userId: 2,
-    storeId: 2,
-    rating: 5,
-    userName: "Marcus Benjamin Thornton",
-    date: "2025-05-12",
-  },
-];
 
 export default function StoreOwnerDashboard({ onLogout }) {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [loading, setLoading] = useState(true);
 
-  const myStore = MOCK_STORES[0];
-  const myRatings = MOCK_RATINGS.filter((r) => r.storeId === myStore.id);
+  const [storeDetails, setStoreDetails] = useState({ name: "", address: "" });
+  const [averageRating, setAverageRating] = useState(0);
+  const [ratingsList, setRatingsList] = useState([]);
+
+  useEffect(() => {
+    const getDashboardData = async () => {
+      try {
+        setLoading(true);
+        const response = await API.get("/store/owner-dashboard");
+
+        const { storeDetails, averageRating, reviewers } = response.data;
+
+        setStoreDetails(storeDetails);
+        setAverageRating(averageRating);
+        setRatingsList(reviewers);
+      } catch (err) {
+        console.error("Failed to load merchant dashboard metrics:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getDashboardData();
+  }, []);
+
   const {
     sorted: sortedRatings,
     sortConfig,
     toggle,
-  } = useSortableTable(myRatings, "userName");
+  } = useSortableTable(ratingsList, "reviewer_name");
 
   const tabs = [
     { id: "dashboard", label: "My Store", icon: "📊" },
     { id: "settings", label: "Settings", icon: "⚙️" },
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center font-sans">
+        <div className="animate-spin h-6 w-6 border-2 border-amber-500 border-t-transparent rounded-full mb-2"></div>
+        <p className="text-xs text-gray-400 font-medium">
+          Loading store dashboard analytics...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <Layout
@@ -100,56 +66,59 @@ export default function StoreOwnerDashboard({ onLogout }) {
       setActiveTab={setActiveTab}
       tabs={tabs}
     >
-      {/* DASHBOARD */}
       {activeTab === "dashboard" && (
         <div className="space-y-6">
           <div>
             <h1 className="text-xl font-semibold text-gray-900">
-              {myStore.name}
+              {storeDetails.name}
             </h1>
-            <p className="text-sm text-gray-500 mt-0.5">{myStore.address}</p>
+            <p className="text-sm text-gray-500 mt-0.5">
+              {storeDetails.address}
+            </p>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <StatCard
               icon="⭐"
               label="Average Rating"
-              value={myStore.avgRating.toFixed(1)}
+              value={averageRating.toFixed(1)}
               color="amber"
             />
             <StatCard
               icon="📝"
               label="Total Ratings"
-              value={myStore.totalRatings}
+              value={ratingsList.length}
               color="emerald"
             />
             <StatCard
               icon="👥"
               label="Unique Raters"
-              value={myRatings.length}
+              value={ratingsList.length}
               color="purple"
             />
           </div>
 
-          {/* Rating breakdown */}
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex items-center gap-8">
             <div className="text-center shrink-0">
               <div className="text-5xl font-bold text-amber-500">
-                {myStore.avgRating.toFixed(1)}
+                {averageRating.toFixed(1)}
               </div>
               <div className="text-xs text-gray-400 mt-1">out of 5</div>
               <div className="mt-2">
-                <StarDisplay value={myStore.avgRating} size="md" />
+                <StarDisplay value={averageRating} size="md" />
               </div>
               <div className="text-xs text-gray-500 mt-1">
-                Based on {myStore.totalRatings} ratings
+                Based on {ratingsList.length} ratings
               </div>
             </div>
+
             <div className="flex-1 space-y-1.5">
               {[5, 4, 3, 2, 1].map((star) => {
-                const count = myRatings.filter((r) => r.rating === star).length;
-                const pct = myRatings.length
-                  ? Math.round((count / myRatings.length) * 100)
+                const count = ratingsList.filter(
+                  (r) => r.submitted_score === star,
+                ).length;
+                const pct = ratingsList.length
+                  ? Math.round((count / ratingsList.length) * 100)
                   : 0;
                 return (
                   <div key={star} className="flex items-center gap-2">
@@ -157,7 +126,7 @@ export default function StoreOwnerDashboard({ onLogout }) {
                     <span className="text-xs text-amber-400">★</span>
                     <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-amber-400 rounded-full transition-all"
+                        className="h-full bg-amber-400 rounded-full transition-all duration-500"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -170,7 +139,6 @@ export default function StoreOwnerDashboard({ onLogout }) {
             </div>
           </div>
 
-          {/* Raters table */}
           <div>
             <h2 className="text-sm font-semibold text-gray-800 mb-3">
               Users who rated your store
@@ -181,44 +149,44 @@ export default function StoreOwnerDashboard({ onLogout }) {
                   <tr>
                     <SortableHeader
                       label="User Name"
-                      field="userName"
+                      field="reviewer_name"
                       sortConfig={sortConfig}
                       onSort={toggle}
                     />
                     <SortableHeader
                       label="Rating"
-                      field="rating"
+                      field="submitted_score"
                       sortConfig={sortConfig}
                       onSort={toggle}
                     />
                     <SortableHeader
                       label="Date"
-                      field="date"
+                      field="reviewed_at"
                       sortConfig={sortConfig}
                       onSort={toggle}
                     />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {sortedRatings.map((r) => (
+                  {sortedRatings.map((r, idx) => (
                     <tr
-                      key={r.id}
+                      key={idx}
                       className="hover:bg-gray-50 transition-colors"
                     >
                       <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                        {r.userName}
+                        {r.reviewer_name}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <StarDisplay value={r.rating} />
+                          <StarDisplay value={r.submitted_score} />
                           <span className="text-xs font-semibold text-amber-600">
-                            {r.rating}
+                            {r.submitted_score}
                           </span>
                           <span className="text-xs text-gray-400">/ 5</span>
                         </div>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-500">
-                        {r.date}
+                        {new Date(r.reviewed_at).toISOString().split("T")[0]}
                       </td>
                     </tr>
                   ))}
@@ -226,7 +194,7 @@ export default function StoreOwnerDashboard({ onLogout }) {
               </table>
               {sortedRatings.length === 0 && (
                 <div className="text-center py-10 text-sm text-gray-400">
-                  No ratings yet
+                  No ratings recorded yet for your storefront.
                 </div>
               )}
             </div>
@@ -234,7 +202,6 @@ export default function StoreOwnerDashboard({ onLogout }) {
         </div>
       )}
 
-      {/* SETTINGS */}
       {activeTab === "settings" && (
         <div className="max-w-md space-y-6">
           <div>

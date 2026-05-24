@@ -90,7 +90,6 @@ export default function LoginForm({ onSwitch }) {
           hover:bg-emerald-700 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed mt-1"
       >
         {" "}
-        {/* Trimmed height padding to py-2 to maintain compact visual alignment */}
         {isSubmitting ? (
           <span className="flex items-center justify-center gap-2">
             <svg
