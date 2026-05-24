@@ -10,7 +10,24 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [process.env.FRONTEND_URL];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  }),
+);
+
+
 app.use(express.json());
 
 await initDB();
@@ -25,7 +42,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/store", storeRoutes);
-app.use("/api/admin",adminRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
