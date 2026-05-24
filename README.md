@@ -147,7 +147,7 @@ This project uses **[NeonDB](https://neon.tech)** — a serverless PostgreSQL pl
 ### Step 2 — Admin credentials
 ### 🌐 Deployed Access vs. Localhost Testing
 
-* **Live Deployed Environment:** * **Admin Email:** `admin@admin.com`
+* **Live Deployed Environment:**  **Admin Email:** `admin@admin.com`
   **Admin Password:** `Suprodip456@`  *(Note: These credentials only work on the live deployed version of the application).*
 * **Localhost Environment:** * You can go to neondb console, change the role of the user to 'Admin' and continue working
 
